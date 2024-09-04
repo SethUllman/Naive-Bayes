@@ -4,7 +4,6 @@ import os
 
 class DataHandler:
 	def __init__(self, filePath, columnNames):
-        #imports file path to data and created data frame to work with
 		self.filePath = filePath
 		self.workingData = pd.read_csv(self.filePath, delimiter=',', header=None, names=columnNames)
 
@@ -15,13 +14,11 @@ class DataHandler:
 		pass
 
 	def separateSets(self):
-        #shuffle the entries in the data set
 		self.workingData = self.workingData.sample(frac=1).reset_index(drop=True)
 		folds = []
 		foldCount = 10
 		foldSize = len(self.workingData) // foldCount
 		
-        #creates folds of equal size and returns list of folds
 		start = 0
 		for i in range(foldCount):
 			if i == foldCount - 1:
