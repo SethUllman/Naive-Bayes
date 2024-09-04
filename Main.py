@@ -4,7 +4,7 @@ from Model import Model
 class Main:
 	def __init__(self, filePath, columnNames):
 		self.handler = DataHandler(filePath, columnNames)
-		self.trainingSet, self.testingSet = self.handler.separateSets()
+		self.handler.separateSets()
 		self.noisyTrainingSet = None
 		self.noisyTestingSet = None
 		self.testResults = None
