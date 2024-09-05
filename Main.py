@@ -5,6 +5,7 @@ class Main:
 	def __init__(self, filePath, columnNames):
 		self.handler = DataHandler(filePath, columnNames)
 		self.handler.separateSets()
+		self.handler.addNoise()
 		self.noisyTrainingSet = None
 		self.noisyTestingSet = None
 		self.testResults = None
