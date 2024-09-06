@@ -1,6 +1,7 @@
 class Model:
-	def __init__(self, trainingSet):
-		data = trainingSet
+	def __init__(self, trainingFolds, testFold):
+		self.trainingFolds = trainingFolds
+		self.testFold = testFold
 
 	def train(self):
-		pass
+		print("training model")
