@@ -1,0 +1,40 @@
+import pandas as pd
+
+class Model:
+    def __init__(self, testFold, trainingFolds, className):
+        self.trainingFolds = pd.concat(trainingFolds)
+        self.testFold = testFold
+        self.className = className
+
+        self.classProbs = {}  #{Class1: prob, Class2: prob}
+        self.conditionalProps = {}  #{Class1: {Value1: Prob, Value2: Prob}, Class2: {}}
+
+    #finds the probability of the classes possible values
+    def findClassProbs(self):
+        length = len(self.trainingFolds)
+
+        #get a count of each class value
+        counts = self.trainingFolds[self.className].value_counts()
+
+        #convert counts dataframe to a dictionary
+        countDict = dict(counts)
+        countDict = {k: int(v) for k, v in countDict.items()}
+
+        #using our counts and total training entries, find probabilities
+        #for all Class values
+        for key, value in countDict.items():
+            self.classProbs[key] = value / length
+
+
+    #finds the probability of features given a class: main algorithm
+    def findConditionalProbs(self):
+        for index, row in self.trainingFolds.iterrows():
+            for col in self.trainingFolds.columns:
+                value = row[col]
+                print(row)
+                print(value)
+                print("---------------")
+    def train(self):
+        print("training model")
+        self.findClassProbs()
+        self.findConditionalProbs()
