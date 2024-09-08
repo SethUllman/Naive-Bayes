@@ -2,12 +2,13 @@ from DataHandler import DataHandler
 from Model import Model
 
 class Main:
-    def __init__(self, filePath, columnNames, className):
+    def __init__(self, filePath, columnNames, className, ignoreList):
         #initialize data handler, clean data, and separate into 10 folds
         self.handler = DataHandler(filePath, columnNames)
         self.cleanFolds = self.handler.separateSets(self.handler.workingData)
         self.noisyFolds = self.handler.separateSets(self.handler.addNoise())
         self.className = className
+        self.ignoreList = ignoreList
         
         #create 10 trained models for both the clean and noisy data
         self.cleanModels = self.train(self.cleanFolds)
@@ -20,7 +21,7 @@ class Main:
         models = []
 
         for i in range(10):
-            model = Model(folds[0], folds[1:], self.className)
+            model = Model(folds[0], folds[1:], self.className, self.ignoreList)
             model.train()
             models.append(model)
             folds.append(folds[0])
