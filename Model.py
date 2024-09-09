@@ -1,4 +1,5 @@
 import pandas as pd
+from collections import defaultdict
 
 class Model:
     def __init__(self, testFold, trainingFolds, className, ignoreList):
@@ -6,7 +7,7 @@ class Model:
         self.testFold = testFold
         self.className = className
         self.ignoreList = ignoreList
-        self.confusionMatrix = {"Correct": 0, "Incorrect": 0}
+        self.confusionMatrix = defaultdict(lambda: defaultdict(int)) #{Class1: {Actual1: count, Actual2: count}, Class2: ...}
 
         self.classCounts = {} #{Class1: count, Class2: count ...}
         self.classProbs = {}  #{Class1: prob, Class2: prob}
@@ -65,18 +66,20 @@ class Model:
     def train(self):
         #driver for the training process, find all probabilities and test
         #the test fold
-        print("training model...")
         self.findClassProbs()
         self.findConditionalProbs(1)
-        self.test()
+        matrix = self.test()
+        return matrix
 
     def test(self):
         #classify each row in the test fold and print total correct
         #and incorrect guesses
         for index, row in self.testFold.iterrows():
             self.classify(row)
-
-        print(self.confusionMatrix)
+        
+        self.confusionMatrix = dict(self.confusionMatrix)
+        dfConfusion = pd.DataFrame(self.confusionMatrix).fillna(0).astype(int)
+        return dfConfusion
 
 
     def classify(self, row):
@@ -97,10 +100,11 @@ class Model:
             probabilities[key] = probability
 
         #find the classification with the largest probability
-        maxClass = max(probabilities, key=probabilities.get)
+        predictedClass = max(probabilities, key=probabilities.get)
+        actualClass = row[self.className]
 
-        #increment correct or incorrect guess counts based on outcome
-        if maxClass == row[self.className]:
-            self.confusionMatrix["Correct"] += 1
-        else:
-            self.confusionMatrix["Incorrect"] += 1
+        self.confusionMatrix[predictedClass][actualClass] += 1
+
+		
+        
+		

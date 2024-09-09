@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import random
 
 
@@ -7,6 +8,18 @@ class DataHandler:
         #imports file path to data and created data frame to work with
 		self.filePath = filePath
 		self.workingData = pd.read_csv(self.filePath, delimiter=',', header=None, names=columnNames)
+		self.columnNames = columnNames
+
+		#if filePath == "./data/Breast Cancer Wisconsin Data.data":
+		#	self.clean_breast_cancer()
+		#elif filePath == "./data/Glass data ML assignment.data":
+		#	self.clean_glass()
+		#elif filePath == "./data/House Votes 84 Data.data":
+		#	self.clean_votes()
+		#elif filePath == "./data/Iris data from ecat.montana.data":
+		#	self.clean_iris()
+		#elif filePath == "./data/Soybean small data from ecat.montana.data":
+		#	self.clean_soybean()
 
 	def clean_breast_cancer(self):
 		# Converts ? to NaN
@@ -31,20 +44,14 @@ class DataHandler:
 		return self.workingData
 
 	def clean_glass(self):
-		columnNames = [
-			'Id number', 'RI', 'Na', 'Mg', 'Al', 'Si', 'K', 'Ca', 'Ba', 'Fe', 'Type of glass (Class)'
-		]
 		self.filePath = "./data/Glass data ML assignment.data"
-		self.workingData = pd.read_csv(self.filePath, delimiter=',', header=None, names=columnNames)
+		self.workingData = pd.read_csv(self.filePath, delimiter=',', header=None, names=self.columnNames)
 		return self.workingData
 
 
 	def clean_iris(self):
-		columnNames = [
-			'Sepal length (cm)', 'Sepal width (cm)', 'Petal length (cm)', 'Petal width (cm)', 'Class'
-		]
 		self.filePath = "./data/Iris data from ecat.montana.data"
-		self.workingData = pd.read_csv(self.filePath, delimiter=',', header=None, names=columnNames)
+		self.workingData = pd.read_csv(self.filePath, delimiter=',', header=None, names=self.columnNames)
 
 		self.workingData.replace({'Iris-setosa': 0, 'Iris-versicolor': 1, 'Iris-virginica': 2}, inplace=True)
 		return self.workingData
@@ -57,7 +64,7 @@ class DataHandler:
 			'Leaf mildew', 'Stem', 'Lodging', 'Stem cankers', 'Canker lesion', 'Fruiting bodies', 'External decay'
 		]
 		self.filePath = "./data/Soybean small data from ecat.montana.data"
-		self.workingData = pd.read_csv(self.filePath, delimiter=',', header=None, names=columnNames)
+		self.workingData = pd.read_csv(self.filePath, delimiter=',', header=None, names=self.columnNames)
 
 		self.workingData.replace({'D1': 1, 'D2': 2, 'D3': 3, 'D4': 4}, inplace=True)
 
@@ -72,7 +79,7 @@ class DataHandler:
 			'superfund-right-to-sue', 'crime', 'duty-free-exports', 'export-administration-act-south-africa'
 			]
 		self.filePath = "./data/House Votes 84 Data.data"
-		self.workingData = pd.read_csv(self.filePath, delimiter=',', header=None, names=columnNames)
+		self.workingData = pd.read_csv(self.filePath, delimiter=',', header=None, names=self.columnNames)
 		# Replace '?' with NaN for easier processing
 		self.workingData.replace('?', pd.NA, inplace=True)
 
@@ -110,21 +117,26 @@ class DataHandler:
 		numColumnsToShuffle = int(numColumns * 0.10)
 
 		#sample 10% of features at random and determine their column name
-		noisyColumns = []
-		for i in range(0, numColumnsToShuffle):
-			noisyColumns.append(random.sample(range(0, numColumns), numColumnsToShuffle))
+		noisyColumns = random.sample(range(0, numColumns), numColumnsToShuffle)
 
-		columnNames = []
-		for i in range(0, len(noisyColumns)):
-			columnNames.append(self.workingData.columns[i])
+		#noisyColumns = []
+		#for i in range(0, numColumnsToShuffle):
+		#	noisyColumns.append(random.sample(range(0, numColumns), numColumnsToShuffle))
+
+		columnNames = self.workingData.columns[noisyColumns]
+		#columnNames = []
+		#for i in range(0, len(noisyColumns)):
+		#	columnNames.append(self.workingData.columns[i])
 		
 		#create a copy of the working data to add noise to
 		noisyData = self.workingData.copy()
 
 		#shuffle values for 10% of features
 		for column in columnNames:
-			noisyData[column] = self.workingData[column].sample(frac=1).reset_index(drop=True)
-
+			shuffledColumn = noisyData[column].sample(frac=1, random_state=42).values
+			noisyData[column] = shuffledColumn
+		
+		noisyData.to_csv("noisy_beans.csv", index=False)
 		return noisyData
 
 	def separateSets(self, dataSet):

@@ -1,5 +1,7 @@
 from DataHandler import DataHandler
 from Model import Model
+import pandas as pd
+import numpy as np
 
 class Main:
     def __init__(self, filePath, columnNames, className, ignoreList):
@@ -11,7 +13,9 @@ class Main:
         self.ignoreList = ignoreList
         
         #create 10 trained models for both the clean and noisy data
+        print("-----------Clean Models------------")
         self.cleanModels = self.train(self.cleanFolds)
+        print("-----------Noisy Models------------")
         self.noisyModels = self.train(self.noisyFolds)
 
 
@@ -19,14 +23,19 @@ class Main:
     #creating 10 models which each use 1 of the folds as a test set
     def train(self, folds):
         models = []
-
+        matrices = []
         for i in range(10):
             model = Model(folds[0], folds[1:], self.className, self.ignoreList)
-            model.train()
+            matrices.append(model.train())
             models.append(model)
             folds.append(folds[0])
             folds.pop(0)
 
+
+        for matrix in matrices:
+            print(matrix)
+            print("----------------")
+        print("")
         return models
 
     def test(self):
