@@ -1,12 +1,14 @@
+import pprint
 import pandas as pd
 from collections import defaultdict
 
 class Model:
-    def __init__(self, testFold, trainingFolds, className, ignoreList):
+    def __init__(self, testFold, trainingFolds, className, ignoreList, alpha):
         self.trainingFolds = pd.concat(trainingFolds)
         self.testFold = testFold
         self.className = className
         self.ignoreList = ignoreList
+        self.alpha = alpha
         self.confusionMatrix = defaultdict(lambda: defaultdict(int)) #{Class1: {Actual1: count, Actual2: count}, Class2: ...}
 
         self.classCounts = {} #{Class1: count, Class2: count ...}
@@ -30,7 +32,7 @@ class Model:
             self.classProbs[key] = value / length
 
 
-    def findConditionalProbs(self, d):
+    def findConditionalProbs(self):
         #iterate through every value in the data set by row and column
         for index, row in self.trainingFolds.iterrows():
             for col in self.trainingFolds.columns:
@@ -59,15 +61,16 @@ class Model:
             classCount = self.classCounts[className]
 
             for col in self.conditionalProps[className]:
+                d = len(self.conditionalProps[className][col])
                 for value in self.conditionalProps[className][col]:
-                    probability = (self.conditionalProps[className][col][value] + 1) / (classCount + d)
+                    probability = (self.conditionalProps[className][col][value] + self.alpha) / (classCount + d)
                     self.conditionalProps[className][col][value] = probability
 
     def train(self):
         #driver for the training process, find all probabilities and test
         #the test fold
         self.findClassProbs()
-        self.findConditionalProbs(1)
+        self.findConditionalProbs()
         matrix = self.test()
         return matrix
 
@@ -102,7 +105,6 @@ class Model:
         #find the classification with the largest probability
         predictedClass = max(probabilities, key=probabilities.get)
         actualClass = row[self.className]
-
         self.confusionMatrix[predictedClass][actualClass] += 1
 
 		
