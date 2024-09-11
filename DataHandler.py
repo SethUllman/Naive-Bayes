@@ -2,15 +2,17 @@ import pandas as pd
 import numpy as np
 import random
 import math
+pd.set_option('future.no_silent_downcasting', True)
 
 
 class DataHandler:
-    def __init__(self, filePath, columnNames, continuousColumns):
+    def __init__(self, filePath, columnNames, ignoreList, continuousColumns):
         #imports file path to data and created data frame to work with
         self.filePath = filePath
         self.continuousColumns = continuousColumns
         self.workingData = pd.read_csv(self.filePath, delimiter=',', header=None, names=columnNames)
         self.columnNames = columnNames
+        self.ignoreList = ignoreList
 
         if filePath == "./data/Breast Cancer Wisconsin Data.data":
             self.clean_breast_cancer()
@@ -122,26 +124,17 @@ class DataHandler:
 
     def addNoise(self):
         #determins how many features need to be shuffled (10%)
-        numColumns = self.workingData.shape[1]
-        numColumnsToShuffle = int(numColumns * 0.10)
 
         #sample 10% of features at random and determine their column name
-        noisyColumns = random.sample(range(0, numColumns), numColumnsToShuffle)
+        filteredList = [col for col in self.workingData.columns if col not in self.ignoreList]
+        numColumnsToShuffle = max(1, int(len(filteredList) * 0.10))
+        noisyColumns = random.sample(filteredList, numColumnsToShuffle)
 
-        #noisyColumns = []
-        #for i in range(0, numColumnsToShuffle):
-        #   noisyColumns.append(random.sample(range(0, numColumns), numColumnsToShuffle))
-
-        columnNames = self.workingData.columns[noisyColumns]
-        #columnNames = []
-        #for i in range(0, len(noisyColumns)):
-        #   columnNames.append(self.workingData.columns[i])
-        
         #create a copy of the working data to add noise to
         noisyData = self.workingData.copy()
 
         #shuffle values for 10% of features
-        for column in columnNames:
+        for column in noisyColumns:
             shuffledColumn = noisyData[column].sample(frac=1, random_state=42).values
             noisyData[column] = shuffledColumn
         

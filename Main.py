@@ -6,7 +6,7 @@ import numpy as np
 class Main:
     def __init__(self, filePath, columnNames, className, ignoreList, continuousColumns, alpha):
         #initialize data handler, clean data, and separate into 10 folds
-        self.handler = DataHandler(filePath, columnNames, continuousColumns)
+        self.handler = DataHandler(filePath, columnNames, ignoreList, continuousColumns)
         self.cleanFolds = self.handler.separateSets(self.handler.workingData)
         self.noisyFolds = self.handler.separateSets(self.handler.addNoise())
         self.className = className
@@ -14,9 +14,7 @@ class Main:
         self.alpha = alpha
 
         #create 10 trained models for both the clean and noisy data
-        print("-----------Clean Models------------")
         self.cleanModels = self.train(self.cleanFolds)
-        print("-----------Noisy Models------------")
         self.noisyModels = self.train(self.noisyFolds)
 
 
