@@ -117,6 +117,7 @@ class DataHandler:
         return self.workingData
 
     def discretize(self):
+        #for every column containing continuous values, bin them with pd.cut()
         for column in self.continuousColumns:
             dataPoints = self.workingData[column].dropna().shape[0]
             bins = math.sqrt(dataPoints)
@@ -138,7 +139,6 @@ class DataHandler:
             shuffledColumn = noisyData[column].sample(frac=1, random_state=42).values
             noisyData[column] = shuffledColumn
         
-        noisyData.to_csv("noisy_beans.csv", index=False)
         return noisyData
 
     def separateSets(self, dataSet):

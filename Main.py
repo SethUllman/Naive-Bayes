@@ -29,7 +29,9 @@ class Main:
             models.append(model)
             folds.append(folds[0])
             folds.pop(0)
-
+        
+        #our matrices list contains confusion matrices for all ten
+        #test sets, the following code combines them into one.
         labels = sorted(set().union(*[matrix.index for matrix in matrices], *[matrix.columns for matrix in matrices]))
         for i in range(len(matrices)):
             matrices[i] = matrices[i].reindex(index=labels, columns=labels, fill_value=0)
@@ -37,9 +39,4 @@ class Main:
         combined = sum(matrices)
         return combined
 
-    def test(self):
-        pass
-
-    def visualizeResults(self):
-        pass
 

@@ -1,7 +1,7 @@
 from Main import Main
 import numpy as np
 
-
+#dictionaries containing the models alpha value and performance with said value
 cleanCancer = {}
 noisyCancer = {}
 cleanGlass = {}
@@ -14,6 +14,7 @@ cleanSoybean = {}
 noisySoybean = {}
 
 
+#implements a basic grid search for alpha
 for i in range(2, 1000, 2):
     print(str(i/10) + "/100")
     cancer = Main("./data/Breast Cancer Wisconsin Data.data", ["Sample code number", "Clump Thickness", "Uniformity of Cell Size", "Uniformity of Cell Shape", "Marginal Adhesion", "Singel Epithelial Cell Size", "Bare Nuclei", "Bland Chromatin", "Normal Nucleoli", "Mitoses", "Class"], "Class", ["Sample code number", "Class"], [], i/10)
@@ -41,6 +42,9 @@ for i in range(2, 1000, 2):
     cleanSoybean[i/10] = np.sum(np.diagonal(soybean.cleanModels.values))
     noisySoybean[i/10] = np.sum(np.diagonal(soybean.noisyModels.values))
 
+
+#This section trains models with their optimized alpha
+#and displays the results to the terminal
 
 cancer = Main("./data/Breast Cancer Wisconsin Data.data", ["Sample code number", "Clump Thickness", "Uniformity of Cell Size", "Uniformity of Cell Shape", "Marginal Adhesion", "Singel Epithelial Cell Size", "Bare Nuclei", "Bland Chromatin", "Normal Nucleoli", "Mitoses", "Class"], "Class", ["Sample code number", "Class"], [], max(cleanCancer, key=cleanCancer.get))
 
